@@ -26,7 +26,7 @@ logging.basicConfig(
 
 def import_edi(edi_records, src_path, dest_path, archive_path, archive_time):
     backup_path = create_backup_folder(archive_path, archive_time)
-    email_msg = 'The following EDI records were imported:'
+    email_msg = 'The following EDI records were found:'
 
     for record in edi_records:
         logging.info('Processing %s' % record)
@@ -43,20 +43,35 @@ def parse_record(record):
     current_record_path = os.path.join(src_path, record)
     with open(current_record_path, 'r') as current_record:
         logging.info('Record opened successfully.')
-        order_info = '\n'
         edi = current_record.readlines()
 
-    parse_lines(edi, order_info)
+    order_info = parse_lines(edi)
 
     logging.info('Parsed record successfully.')
     logging.debug('Order information: %s' % order_info.strip().replace('\n', ' '))
     return order_info
 
-def parse_lines(edi, output, index=0):
+def parse_lines(edi, output='', index=0, totals_parsed=False):
     if index < len(edi):
-        split_line = edi[index].replace('...','').split('*')
-        print index, split_line
-        return parse_lines(edi, output, index+1)
+        split_line = edi[index].replace('\u2026','').replace('\n','').split('*')
+        if split_line[:2] == ['ST','204']:
+            output += '\n\nNew Record: {}\n'.format(split_line[-1])
+        elif split_line[0] == 'L11' and split_line[-1] == 'MB':
+            output += 'Master Bill: {}\n'.format(split_line[1])
+        elif split_line[0] == 'S5' and not totals_parsed:
+            cases = split_line[split_line.index('CA') - 1]
+            weight = split_line[split_line.index('L') - 1]
+            output += 'Cases: {}\nWeight: {}\n'.format(cases, weight)
+            totals_parsed = True
+        elif split_line[:2] == ['G62','38']:
+            formatted_date = format_edi_date(split_line[2])
+            output += 'Ship by: {}\n'.format(formatted_date)
+        return parse_lines(edi, output, index+1, totals_parsed)
+    else:
+        return output
+
+def format_edi_date(raw_date):
+    return raw_date[:4] + '-' + raw_date[4:6] + '-' + raw_date[6:8]
 
 def create_backup_folder(parent_archive_path, archive_time):
     current_archive_path = os.path.join(
@@ -85,7 +100,7 @@ def import_record(record, src_path, import_path):
     logging.info('Moving from %s to %s' % (src_path, import_path))
     src_file = os.path.join(src_path, record)
     import_file = os.path.join(import_path, record)
-    shutil.move(src_file, import_file)
+    shutil.copy(src_file, import_file) # change to move before done
     logging.info('Move was successful.')
 
 def send_email(msg, send_to):
