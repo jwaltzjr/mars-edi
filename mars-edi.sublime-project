@@ -1,0 +1,18 @@
+{
+	"folders":
+	[
+		{
+            "path": "/",
+            "folder_exclude_patterns": ["logs"],
+            "file_exclude_patterns":
+            [
+                "*.pyc",
+                "*.git",
+                ".gitignore",
+                ".gitmodules",
+                "*.sublime-project",
+                "*.sublime-workspace"
+            ]
+		}
+	]
+}
