@@ -54,7 +54,7 @@ def parse_record(record):
 def get_split_line(edi, index):
     return edi[index].replace('\u2026','').replace('\n','').split('*')
 
-def parse_lines(edi, output='', index=0, totals_parsed=False):
+def parse_lines(edi, output='', index=0, totals_parsed=False, pos=[]):
     if index < len(edi):
         split_line = get_split_line(edi, index)
         if split_line[:2] == ['ST','204']:
@@ -77,9 +77,11 @@ def parse_lines(edi, output='', index=0, totals_parsed=False):
             po_number = split_line[2]
             cases = split_line[split_line.index('CA') + 1]
             weight = split_line[split_line.index('L') + 1]
-            output += 'Order: BOL {} | PO {} | PCS {} | LBS {}\n'.format(
-                bol_number, po_number, cases, weight
-            )
+            if po_number not in pos:
+                pos.append(po_number)
+                output += 'Order: BOL {} | PO {} | PCS {} | LBS {}\n'.format(
+                    bol_number, po_number, cases, weight
+                )
         elif split_line[:2] == ['G62','70']:
             formatted_date = format_edi_date(split_line[2])
             output += 'Delivery Date: {}\n'.format(formatted_date)
@@ -98,7 +100,17 @@ def parse_lines(edi, output='', index=0, totals_parsed=False):
                 name, address, city, state, zip_code
             )
             index += 2
-        return parse_lines(edi, output, index+1, totals_parsed)
+        elif split_line[0] == 'SE':
+            # END OF ORDER
+            totals_parsed = False
+            pos = []
+        return parse_lines(
+            edi,
+            output=output,
+            index=index+1,
+            totals_parsed=totals_parsed,
+            pos=pos
+        )
     else:
         return output
 
