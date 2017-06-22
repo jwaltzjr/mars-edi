@@ -86,6 +86,14 @@ def parse_lines(edi, output='', index=0, totals_parsed=False):
         elif split_line[:2] == ['G62','54']:
             formatted_date = format_edi_date(split_line[2])
             output += 'Delivery Window End: {}\n'.format(formatted_date)
+        elif split_line[:2] == ['N1','ST']:
+            name = split_line[2]
+            address = edi[index+1].replace('\u2026','').replace('\n','').split('*')[1]
+            location = edi[index+2].replace('\u2026','').replace('\n','').split('*')
+            city, state, zip_code = location[1:4]
+            output += 'Deliver To:\n{}\n{}\n{}, {} {}'.format(
+                name, address, city, state, zip_code
+            )
         return parse_lines(edi, output, index+1, totals_parsed)
     else:
         return output
