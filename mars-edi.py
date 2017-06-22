@@ -61,11 +61,31 @@ def parse_lines(edi, output='', index=0, totals_parsed=False):
         elif split_line[0] == 'S5' and not totals_parsed:
             cases = split_line[split_line.index('CA') - 1]
             weight = split_line[split_line.index('L') - 1]
-            output += 'Cases: {}\nWeight: {}\n'.format(cases, weight)
+            output += 'Total Cases: {}\nTotal Weight: {}\n'.format(cases, weight)
             totals_parsed = True
         elif split_line[:2] == ['G62','38']:
             formatted_date = format_edi_date(split_line[2])
             output += 'Ship by: {}\n'.format(formatted_date)
+        elif split_line[:2] == ['G62','77']:
+            formatted_date = format_edi_date(split_line[2])
+            output += 'Pickup Date: {}\n'.format(formatted_date)
+        elif split_line[0] == 'OID':
+            bol_number = split_line[1]
+            po_number = split_line[2]
+            cases = split_line[split_line.index('CA') + 1]
+            weight = split_line[split_line.index('L') + 1]
+            output += 'Order: BOL {} | PO {} | PCS {} | LBS {}\n'.format(
+                bol_number, po_number, cases, weight
+            )
+        elif split_line[:2] == ['G62','70']:
+            formatted_date = format_edi_date(split_line[2])
+            output += 'Delivery Date: {}\n'.format(formatted_date)
+        elif split_line[:2] == ['G62','53']:
+            formatted_date = format_edi_date(split_line[2])
+            output += 'Delivery Window Start: {}\n'.format(formatted_date)
+        elif split_line[:2] == ['G62','54']:
+            formatted_date = format_edi_date(split_line[2])
+            output += 'Delivery Window End: {}\n'.format(formatted_date)
         return parse_lines(edi, output, index+1, totals_parsed)
     else:
         return output
