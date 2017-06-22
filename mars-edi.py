@@ -144,7 +144,7 @@ def import_record(record, src_path, import_path):
     logging.info('Moving from %s to %s' % (src_path, import_path))
     src_file = os.path.join(src_path, record)
     import_file = os.path.join(import_path, record)
-    shutil.copy(src_file, import_file) # change to move before done
+    shutil.move(src_file, import_file)
     logging.info('Move was successful.')
 
 def send_email(msg, send_to):
