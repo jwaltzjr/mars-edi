@@ -51,9 +51,12 @@ def parse_record(record):
     logging.debug('Order information: %s' % order_info.strip().replace('\n', ' '))
     return order_info
 
+def get_split_line(edi, index):
+    return edi[index].replace('\u2026','').replace('\n','').split('*')
+
 def parse_lines(edi, output='', index=0, totals_parsed=False):
     if index < len(edi):
-        split_line = edi[index].replace('\u2026','').replace('\n','').split('*')
+        split_line = get_split_line(edi, index)
         if split_line[:2] == ['ST','204']:
             output += '\n\nNew Record: {}\n'.format(split_line[-1])
         elif split_line[0] == 'L11' and split_line[-1] == 'MB':
@@ -88,12 +91,13 @@ def parse_lines(edi, output='', index=0, totals_parsed=False):
             output += 'Delivery Window End: {}\n'.format(formatted_date)
         elif split_line[:2] == ['N1','ST']:
             name = split_line[2]
-            address = edi[index+1].replace('\u2026','').replace('\n','').split('*')[1]
-            location = edi[index+2].replace('\u2026','').replace('\n','').split('*')
+            address = get_split_line(edi, index+1)[1]
+            location = get_split_line(edi, index+2)
             city, state, zip_code = location[1:4]
-            output += 'Deliver To:\n{}\n{}\n{}, {} {}'.format(
+            output += 'Deliver To:\n{}\n{}\n{}, {} {}\n'.format(
                 name, address, city, state, zip_code
             )
+            index += 2
         return parse_lines(edi, output, index+1, totals_parsed)
     else:
         return output
