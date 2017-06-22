@@ -140,7 +140,6 @@ def backup_record(record, src_path, backup_path):
     logging.info('Backup was successful.')
 
 def import_record(record, src_path, import_path):
-    # Move into the folder Abacus is watching for EDI
     logging.info('Moving from %s to %s' % (src_path, import_path))
     src_file = os.path.join(src_path, record)
     import_file = os.path.join(import_path, record)
