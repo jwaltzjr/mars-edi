@@ -137,15 +137,8 @@ def backup_record(record, src_path, backup_path):
     logging.info('Backing up record from %s to %s' % (src_path, backup_path))
     src_file = os.path.join(src_path, record)
     backup_file = os.path.join(backup_path, record)
-    shutil.copy(src_file, backup_file)
+    shutil.move(src_file, backup_file)
     logging.info('Backup was successful.')
-
-def import_record(record, src_path, import_path):
-    logging.info('Moving from %s to %s' % (src_path, import_path))
-    src_file = os.path.join(src_path, record)
-    import_file = os.path.join(import_path, record)
-    shutil.move(src_file, import_file)
-    logging.info('Move was successful.')
 
 def send_email(msg, send_to):
     logging.info('Building email...')
