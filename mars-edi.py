@@ -31,7 +31,6 @@ def import_edi(edi_records, src_path, dest_path, archive_path, archive_time):
     for record in edi_records:
         logging.info('Processing %s' % record)
         email_msg += parse_record(record)
-        backup_record(record, src_path, backup_path)
         import_record(record, src_path, dest_path)
         logging.info('Finished processing %s' % record)
 
