@@ -63,11 +63,11 @@ def parse_lines(edi, output='', index=0, totals_parsed=False, pos=[]):
         elif split_line[0] == 'S5' and not totals_parsed:
             try:
                 cases = split_line[split_line.index('CA') - 1]
-            except KeyError:
+            except ValueError:
                 cases = 'No info provided.'
             try:
                 weight = split_line[split_line.index('L') - 1]
-            except KeyError:
+            except ValueError:
                 weight = 'No info provided.'
             output += 'Total Cases: {}\nTotal Weight: {}\n'.format(cases, weight)
             totals_parsed = True
