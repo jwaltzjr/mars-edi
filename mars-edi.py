@@ -8,12 +8,12 @@ import env
 from krc.krcemail import KrcEmail
 
 notification_emails = [
-    'jwaltzjr@krclogistics.com'
+    'jwaltzjr@krclogistics.com',
+    'jalamillo@krclogistics.com'
 ]
 
-src_path = r'C:\test\IN'
-dest_path = r'C:\test\OUT'
-archive_path = r'C:\test\ARCHIVE'
+src_path = r'E:\FTP204dump'
+archive_path = r'E:\mars-edi-backup'
 
 runtime = datetime.datetime.now().strftime('%m-%d-%y %H.%M')
 if not os.path.exists('logs'):
