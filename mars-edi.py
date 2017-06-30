@@ -44,7 +44,8 @@ def parse_record(record):
         logging.info('Record opened successfully.')
         edi = current_record.readlines()
 
-    order_info = parse_lines(edi[0].replace('\u2026','\n'))
+    edi_split = edi[0].split('\u2026')
+    order_info = parse_lines(edi_split)
 
     logging.info('Parsed record successfully.')
     logging.debug('Order information: %s' % order_info.strip().replace('\n', ' '))
@@ -91,8 +92,8 @@ def parse_lines(edi, output='', index=0, totals_parsed=False, pos=[]):
             output += 'Delivery Window End: {}\n'.format(formatted_date)
         elif split_line[:2] == ['N1','ST']:
             name = split_line[2]
-            address = get_split_line(edi, index+1)[1]
-            location = get_split_line(edi, index+2)
+            address = edi[index+1].split('*')[1]
+            location = edi[index+2].split('*')
             city, state, zip_code = location[1:4]
             output += 'Deliver To:\n{}\n{}\n{}, {} {}\n'.format(
                 name, address, city, state, zip_code
