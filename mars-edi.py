@@ -24,14 +24,14 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s: %(message)s'
 )
 
-def import_edi(edi_records, src_path, dest_path, archive_path, archive_time):
+def import_edi(edi_records, src_path, archive_path, archive_time):
     backup_path = create_backup_folder(archive_path, archive_time)
     email_msg = 'The following EDI records were found:'
 
     for record in edi_records:
         logging.info('Processing %s' % record)
         email_msg += parse_record(record)
-        import_record(record, src_path, dest_path)
+        backup_record(record, src_path, backup_path)
         logging.info('Finished processing %s' % record)
 
     send_email(email_msg, notification_emails)
@@ -179,7 +179,7 @@ if edi_records:
     logging.info('Edi records found.')
     logging.debug('Records: %s' % edi_records)
     try:
-        import_edi(edi_records, src_path, dest_path, archive_path, runtime)
+        import_edi(edi_records, src_path, archive_path, runtime)
     except:
         logging.exception('Import failed. Closing...')
         raise
