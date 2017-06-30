@@ -8,7 +8,8 @@ import env
 from krc.krcemail import KrcEmail
 
 notification_emails = [
-    'jwaltzjr@krclogistics.com'
+    'jwaltzjr@krclogistics.com',
+    'jalamillo@krclogistics.com'
 ]
 
 src_path = r'E:\FTP204dump'
