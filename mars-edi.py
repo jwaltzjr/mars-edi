@@ -44,18 +44,15 @@ def parse_record(record):
         logging.info('Record opened successfully.')
         edi = current_record.readlines()
 
-    order_info = parse_lines(edi)
+    order_info = parse_lines(edi.replace('\u2026','\n'))
 
     logging.info('Parsed record successfully.')
     logging.debug('Order information: %s' % order_info.strip().replace('\n', ' '))
     return order_info
 
-def get_split_line(edi, index):
-    return edi[index].replace('\u2026','').replace('\n','').split('*')
-
 def parse_lines(edi, output='', index=0, totals_parsed=False, pos=[]):
     if index < len(edi):
-        split_line = get_split_line(edi, index)
+        split_line = edi[index].split('*')
         if split_line[:2] == ['ST','204']:
             output += '\n\nNew Record: {}\n'.format(split_line[-1])
         elif split_line[0] == 'L11' and split_line[-1] == 'WH':
