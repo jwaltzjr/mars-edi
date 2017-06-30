@@ -44,7 +44,7 @@ def parse_record(record):
         logging.info('Record opened successfully.')
         edi = current_record.readlines()
 
-    order_info = parse_lines(edi.replace('\u2026','\n'))
+    order_info = parse_lines(edi[0].replace('\u2026','\n'))
 
     logging.info('Parsed record successfully.')
     logging.debug('Order information: %s' % order_info.strip().replace('\n', ' '))
