@@ -61,8 +61,14 @@ def parse_lines(edi, output='', index=0, totals_parsed=False, pos=[]):
         elif split_line[0] == 'L11' and split_line[-1] == 'MB':
             output += 'Master Bill: {}\n'.format(split_line[1])
         elif split_line[0] == 'S5' and not totals_parsed:
-            cases = split_line[split_line.index('CA') - 1]
-            weight = split_line[split_line.index('L') - 1]
+            try:
+                cases = split_line[split_line.index('CA') - 1]
+            except KeyError:
+                cases = 'No info provided.'
+            try:
+                weight = split_line[split_line.index('L') - 1]
+            except KeyError:
+                weight = 'No info provided.'
             output += 'Total Cases: {}\nTotal Weight: {}\n'.format(cases, weight)
             totals_parsed = True
         elif split_line[:2] == ['G62','38']:
@@ -165,15 +171,19 @@ def send_email(msg, send_to):
     else:
         logging.info('Email was sent successfully.')
 
-edi_records = os.listdir(src_path)
-if edi_records:
-    logging.info('Edi records found.')
-    logging.debug('Records: %s' % edi_records)
-    try:
-        import_edi(edi_records, src_path, archive_path, runtime)
-    except:
-        logging.exception('Import failed. Closing...')
-        raise
-    logging.info('Import was finished successfully. Closing...')
-else:
-    logging.warning('Edi records not found. Closing...')
+try:
+    edi_records = os.listdir(src_path)
+    if edi_records:
+        logging.info('Edi records found.')
+        logging.debug('Records: %s' % edi_records)
+        try:
+            import_edi(edi_records, src_path, archive_path, runtime)
+        except:
+            logging.exception('Import failed. Closing...')
+            raise
+        logging.info('Import was finished successfully. Closing...')
+    else:
+        logging.warning('Edi records not found. Closing...')
+except Exception as e:
+    email_message = 'There was an error with the EDI program. Please contact IT to correct.\nError:\n{}'.format(e)
+    send_email(email_message, notification_emails)
